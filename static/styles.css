@@ -61,7 +61,7 @@ nav ul li a:hover {
 
 /* Отступ для изображения под фиксированным хедером */
 .hero-image {
-    background-image: url("/static/image.jpg");
+    background-image:  url("/static/image/image.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
