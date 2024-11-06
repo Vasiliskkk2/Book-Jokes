@@ -26,6 +26,7 @@ header {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+/* Стили логотипа и навигации в хедере */
 .header-container {
     display: flex;
     justify-content: space-between;
@@ -260,31 +261,6 @@ footer#community {
     margin: auto;
 }
 
-.community-container h2 {
-    margin-bottom: 15px;
-    font-size: 20px;
-    color: #ffdd57;
-}
-
-.community-list {
-    list-style: none;
-    padding: 0;
-}
-
-.community-list li {
-    margin: 10px 0;
-}
-
-.community-list li a {
-    color: #ffdd57;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
-}
-
-.community-list li a:hover {
-    color: #ffffff;
-}
 
 
 
