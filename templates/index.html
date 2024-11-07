@@ -37,6 +37,9 @@
         </div>
     </div>
 
+    <!-- Временный блок для отладки, чтобы проверить сгенерированный путь -->
+    <p>Путь к изображению: {{ url_for('static', filename='images/image.jpg') }}</p>
+
     <main>
         <div class="content-container">
             <section id="about">
@@ -100,6 +103,7 @@
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
+
 
 
 
