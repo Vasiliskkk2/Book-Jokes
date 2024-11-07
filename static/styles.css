@@ -61,7 +61,7 @@ nav ul li a:hover {
 
 /* Отступ для изображения под фиксированным хедером */
 .hero-image {
-    background-image:  url("/static/images/image.jpg");
+    background-image: url("{{ url_for('static', filename='images/image.jpg') }}"); /* Исправленный путь */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -183,9 +183,9 @@ ul li {
 #joke {
     font-size: 18px;
     line-height: 1.6;
-    max-width: 500px; /* Ограничиваем ширину текста анекдота */
-    margin: 0 auto; /* Центрирование текста */
-    padding: 10px; /* Добавляем отступы для более аккуратного вида */
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 10px;
     color: #e2e2e2;
 }
 
@@ -205,11 +205,15 @@ ul li {
     border: none;
     background-color: #7289da;
     color: #ffffff;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.1s ease-out;
 }
 
 .button-container button:hover {
     background-color: #5a6eb9;
+}
+
+.button-container button:active {
+    transform: scale(0.95);
 }
 
 /* Стили для окна Топ 10 шуток */
@@ -245,6 +249,12 @@ ul li {
     background-color: #5a5a5a;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.top-jokes-list li:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* Стили для раздела Сообщества */
@@ -260,6 +270,32 @@ footer#community {
     max-width: 600px;
     margin: auto;
 }
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-image {
+        height: 50vh;
+    }
+
+    nav ul {
+        gap: 10px;
+    }
+
+    .joke-container, .top-jokes-container {
+        width: 90%;
+    }
+
+    .button-container button {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
+
 
 
 

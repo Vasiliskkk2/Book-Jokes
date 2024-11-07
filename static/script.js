@@ -8,11 +8,13 @@ function fetchJoke() {
         .then(response => response.json())
         .then(data => {
             const joke = data.joke;
-            jokeHistory.push(joke); // Добавляем новый анекдот в историю
+            if (!jokeHistory.includes(joke)) { // Проверка на уникальность анекдота
+                jokeHistory.push(joke);
+            }
             currentJokeIndex = jokeHistory.length - 1; // Обновляем текущий индекс
             displayJoke(joke); // Показываем анекдот
         })
-        .catch(error => console.error("Ошибка при загрузке анекдота:", error));
+        .catch(error => handleError("Ошибка при загрузке анекдота:", error));
 }
 
 // Функция для отображения анекдота на странице
@@ -31,58 +33,58 @@ function fetchPreviousJoke() {
     }
 }
 
+// Обработка ошибок
+function handleError(message, error) {
+    console.error(message, error);
+    alert(message);
+}
+
 // Функция для лайка анекдота с проверкой
 function likeJoke() {
-    const joke = jokeHistory[currentJokeIndex];
-    fetch("/api/like_joke", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ joke })
-    })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    alert(data.error); // Выводим ошибку, если IP уже оценил анекдот
-                    throw new Error(data.error);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById("like-count").innerText = `Лайков: ${data.likes}`;
-            document.getElementById("dislike-count").innerText = `Дизлайков: ${data.dislikes}`;
-            fetchTopJokes(); // Обновляем топ-10 шуток после лайка
-        })
-        .catch(error => console.error("Ошибка при лайке анекдота:", error));
+    handleLikeDislike("/api/like_joke", "like");
 }
 
 // Функция для дизлайка анекдота с проверкой
 function dislikeJoke() {
+    handleLikeDislike("/api/dislike_joke", "dislike");
+}
+
+// Универсальная функция для обработки лайков и дизлайков
+function handleLikeDislike(endpoint, type) {
     const joke = jokeHistory[currentJokeIndex];
-    fetch("/api/dislike_joke", {
+    const likeButton = document.querySelector(".like-button");
+    const dislikeButton = document.querySelector(".dislike-button");
+
+    // Деактивация кнопок для предотвращения быстрого повторного нажатия
+    likeButton.disabled = true;
+    dislikeButton.disabled = true;
+
+    fetch(endpoint, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ joke })
     })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    alert(data.error); // Выводим ошибку, если IP уже оценил анекдот
-                    throw new Error(data.error);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById("like-count").innerText = `Лайков: ${data.likes}`;
-            document.getElementById("dislike-count").innerText = `Дизлайков: ${data.dislikes}`;
-            fetchTopJokes(); // Обновляем топ-10 шуток после дизлайка
-        })
-        .catch(error => console.error("Ошибка при дизлайке анекдота:", error));
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                alert(data.error);
+                throw new Error(data.error);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        document.getElementById("like-count").innerText = `Лайков: ${data.likes}`;
+        document.getElementById("dislike-count").innerText = `Дизлайков: ${data.dislikes}`;
+        fetchTopJokes(); // Обновляем топ-10 шуток после оценки
+    })
+    .catch(error => handleError(`Ошибка при ${type === "like" ? "лайке" : "дизлайке"} анекдота:`, error))
+    .finally(() => {
+        likeButton.disabled = false;
+        dislikeButton.disabled = false;
+    });
 }
 
 // Функция для получения топ-10 шуток
@@ -98,7 +100,7 @@ function fetchTopJokes() {
                 topJokesList.appendChild(listItem);
             });
         })
-        .catch(error => console.error("Ошибка при получении топ-10 шуток:", error));
+        .catch(error => handleError("Ошибка при получении топ-10 шуток:", error));
 }
 
 // Загрузка анекдота при открытии страницы
@@ -107,28 +109,24 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchTopJokes();
 });
 
-// Функция для анимации глаз, чтобы они следовали за мышью
+// Анимация глаз для слежения за курсором
 document.addEventListener("mousemove", (event) => {
     const eyes = document.querySelectorAll(".eye");
-    eyes.forEach((eye) => {
-        const pupil = eye.querySelector(".pupil");
-        const eyeRect = eye.getBoundingClientRect();
-
-        // Находим центр глаза
-        const eyeCenterX = eyeRect.left + eyeRect.width / 2;
-        const eyeCenterY = eyeRect.top + eyeRect.height / 2;
-
-        // Вычисляем угол движения зрачка
-        const angle = Math.atan2(event.clientY - eyeCenterY, event.clientX - eyeCenterX);
-
-        // Устанавливаем смещение для зрачка
-        const maxOffset = 15; // Максимальное смещение зрачка от центра глаза
-        const pupilX = Math.cos(angle) * maxOffset;
-        const pupilY = Math.sin(angle) * maxOffset;
-
-        pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+    window.requestAnimationFrame(() => {
+        eyes.forEach((eye) => {
+            const pupil = eye.querySelector(".pupil");
+            const eyeRect = eye.getBoundingClientRect();
+            const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+            const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+            const angle = Math.atan2(event.clientY - eyeCenterY, event.clientX - eyeCenterX);
+            const maxOffset = 15;
+            const pupilX = Math.cos(angle) * maxOffset;
+            const pupilY = Math.sin(angle) * maxOffset;
+            pupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+        });
     });
 });
+
 
 
 
