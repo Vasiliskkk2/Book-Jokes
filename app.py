@@ -5,7 +5,7 @@ from flask import Flask, render_template, jsonify, request
 from collections import defaultdict
 import time
 
-app = Flask(__name__, static_url_path='/static', static_folder='static')
+app = Flask(__name__)
 
 # Данные для хранения анекдотов и количества лайков и дизлайков с IP-адресами
 jokes_data = defaultdict(lambda: {"joke": "", "likes": 0, "dislikes": 0, "rated_ips": {}})
@@ -116,7 +116,6 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
 
 
 

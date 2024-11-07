@@ -61,7 +61,7 @@ nav ul li a:hover {
 
 /* Отступ для изображения под фиксированным хедером */
 .hero-image {
-    background-image: url("{{ url_for('static', filename='images/image.jpg') }}"); /* Исправленный путь */
+    background-image: url("{{ url_for('static', filename='images/boja.jpg') }}"); /* Исправленный путь */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
