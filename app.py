@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 from flask import Flask, render_template, jsonify, request
 from collections import defaultdict
 import time
+from os import listdir
+from os.path import isfile, join
 
 app = Flask(__name__)
 
@@ -12,12 +14,10 @@ jokes_data = defaultdict(lambda: {"joke": "", "likes": 0, "dislikes": 0, "rated_
 top_jokes = []
 rate_limit = defaultdict(lambda: {"last_request_time": 0, "count": 0})
 
-
 # Эндпоинт для парсинга случайного анекдота с сайта
 @app.route("/api/get_joke")
 def get_joke():
     url = "https://anekdot.ru/random/anekdot/"
-
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -35,7 +35,6 @@ def get_joke():
     except requests.RequestException:
         return jsonify({"error": "Не удалось получить анекдот"}), 503
 
-
 # Функция для ограничения частоты запросов с одного IP
 def rate_limit_check(ip):
     current_time = time.time()
@@ -44,7 +43,6 @@ def rate_limit_check(ip):
     else:
         rate_limit[ip] = {"last_request_time": current_time, "count": 1}
     return rate_limit[ip]["count"] <= 5
-
 
 # Эндпоинт для добавления лайка анекдоту с проверкой IP-адреса
 @app.route("/api/like_joke", methods=["POST"])
@@ -69,7 +67,6 @@ def like_joke():
         return jsonify({"likes": jokes_data[joke_text]["likes"], "dislikes": jokes_data[joke_text]["dislikes"]})
     return jsonify({"error": "Анекдот не найден"}), 404
 
-
 # Эндпоинт для добавления дизлайка анекдоту с проверкой IP-адреса
 @app.route("/api/dislike_joke", methods=["POST"])
 def dislike_joke():
@@ -93,7 +90,6 @@ def dislike_joke():
         return jsonify({"likes": jokes_data[joke_text]["likes"], "dislikes": jokes_data[joke_text]["dislikes"]})
     return jsonify({"error": "Анекдот не найден"}), 404
 
-
 # Функция для обновления списка топ-10 анекдотов по количеству лайков
 def update_top_jokes():
     global top_jokes
@@ -101,25 +97,21 @@ def update_top_jokes():
     sorted_jokes = sorted(jokes_data.values(), key=lambda x: x["likes"], reverse=True)
     top_jokes = sorted_jokes[:10]
 
-
 # Эндпоинт для получения топ-10 анекдотов
 @app.route("/api/top_jokes")
 def get_top_jokes():
     return jsonify(top_jokes)
 
+# Эндпоинт для проверки файлов в папке static/images
+@app.route("/check_static")
+def check_static():
+    image_files = [f for f in listdir("static/images") if isfile(join("static/images", f))]
+    return jsonify(image_files)
 
 # Главная страница
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-
-
