@@ -7,7 +7,7 @@ import time
 
 app = Flask(__name__)
 
-# Данные для хранения анекдотов и количества лайков и дизлайков с IP-адресами
+# Данные для хранения анекдотов и количества лайков/дизлайков с IP-адресами
 jokes_data = defaultdict(lambda: {"joke": "", "likes": 0, "dislikes": 0, "rated_ips": {}})
 top_jokes = []
 rate_limit = defaultdict(lambda: {"last_request_time": 0, "count": 0})
@@ -32,7 +32,7 @@ def get_joke():
             jokes_data[joke] = {"joke": joke, "likes": 0, "dislikes": 0, "rated_ips": {}}
 
         return jsonify({"joke": joke})
-    except requests.RequestException as e:
+    except requests.RequestException:
         return jsonify({"error": "Не удалось получить анекдот"}), 503
 
 
@@ -116,6 +116,7 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
